@@ -38,6 +38,16 @@ export const ChatInterface = ({ personality, onBack }: ChatInterfaceProps) => {
   const handleSend = async () => {
     if (!input.trim() || isLoading) return;
 
+    const apiKey = localStorage.getItem("openai_key");
+    if (!apiKey) {
+      toast({
+        title: "Error",
+        description: "Please provide your OpenAI API key in the settings.",
+        variant: "destructive",
+      });
+      return;
+    }
+
     const userMessage: Message = {
       id: Date.now().toString(),
       content: input,
@@ -54,7 +64,7 @@ export const ChatInterface = ({ personality, onBack }: ChatInterfaceProps) => {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
-          Authorization: `Bearer ${localStorage.getItem("openai_key")}`,
+          Authorization: `Bearer ${apiKey}`,
         },
         body: JSON.stringify({
           model: "gpt-4",
@@ -69,7 +79,10 @@ export const ChatInterface = ({ personality, onBack }: ChatInterfaceProps) => {
         }),
       });
 
-      if (!response.ok) throw new Error("Failed to get response");
+      if (!response.ok) {
+        const errorData = await response.json();
+        throw new Error(errorData.error?.message || "Failed to get AI response");
+      }
 
       const data = await response.json();
       const aiMessage: Message = {
@@ -81,9 +94,10 @@ export const ChatInterface = ({ personality, onBack }: ChatInterfaceProps) => {
 
       setMessages((prev) => [...prev, aiMessage]);
     } catch (error) {
+      console.error("API Error:", error);
       toast({
         title: "Error",
-        description: "Failed to get AI response. Please try again.",
+        description: error instanceof Error ? error.message : "Failed to get AI response. Please try again.",
         variant: "destructive",
       });
     } finally {
