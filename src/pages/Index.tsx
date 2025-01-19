@@ -31,8 +31,17 @@ const personalities = [
 
 const Index = () => {
   const [selectedPersonality, setSelectedPersonality] = useState<typeof personalities[0] | null>(null);
-  const [apiKey, setApiKey] = useState(localStorage.getItem("openai_key") || "");
+  const [apiKey, setApiKey] = useState("");
+  const [isKeySet, setIsKeySet] = useState(false);
   const { toast } = useToast();
+
+  useEffect(() => {
+    const savedKey = localStorage.getItem("openai_key");
+    if (savedKey) {
+      setApiKey(savedKey);
+      setIsKeySet(true);
+    }
+  }, []);
 
   const handleSwipe = (direction: "left" | "right", personality: typeof personalities[0]) => {
     if (direction === "right") {
@@ -41,14 +50,24 @@ const Index = () => {
   };
 
   const handleSaveKey = () => {
+    if (!apiKey.trim()) {
+      toast({
+        title: "Error",
+        description: "Please enter an API key",
+        variant: "destructive",
+      });
+      return;
+    }
+
     localStorage.setItem("openai_key", apiKey);
+    setIsKeySet(true);
     toast({
       title: "API Key Saved",
       description: "Your OpenAI API key has been saved.",
     });
   };
 
-  if (!apiKey) {
+  if (!isKeySet) {
     return (
       <div className="min-h-screen flex items-center justify-center p-4">
         <div className="w-full max-w-md space-y-4">
@@ -87,7 +106,7 @@ const Index = () => {
             key={personality.id}
             personality={personality}
             onSwipe={(direction) => handleSwipe(direction, personality)}
-            className="z-[${personalities.length - index}]"
+            className={`z-[${personalities.length - index}]`}
           />
         ))}
       </div>
