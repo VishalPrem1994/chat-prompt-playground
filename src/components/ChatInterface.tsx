@@ -18,9 +18,10 @@ interface ChatInterfaceProps {
     prompt: string;
   };
   onBack: () => void;
+  language: "english" | "hindi";
 }
 
-export const ChatInterface = ({ personality, onBack }: ChatInterfaceProps) => {
+export const ChatInterface = ({ personality, onBack, language }: ChatInterfaceProps) => {
   const [messages, setMessages] = useState<Message[]>([]);
   const [input, setInput] = useState("");
   const [isLoading, setIsLoading] = useState(false);
@@ -69,7 +70,10 @@ export const ChatInterface = ({ personality, onBack }: ChatInterfaceProps) => {
         body: JSON.stringify({
           model: "gpt-4",
           messages: [
-            { role: "system", content: personality.prompt },
+            { 
+              role: "system", 
+              content: `${personality.prompt} Please respond in ${language}. If the user writes in English, translate your response to ${language}.` 
+            },
             ...messages.map((msg) => ({
               role: msg.sender === "user" ? "user" : "assistant",
               content: msg.content,
@@ -105,6 +109,10 @@ export const ChatInterface = ({ personality, onBack }: ChatInterfaceProps) => {
     }
   };
 
+  const getPlaceholderText = () => {
+    return language === "english" ? "Type a message..." : "संदेश टाइप करें...";
+  };
+
   return (
     <div className="chat-container">
       <div className="flex items-center gap-2 p-4 border-b">
@@ -116,7 +124,9 @@ export const ChatInterface = ({ personality, onBack }: ChatInterfaceProps) => {
 
       {isLoading && (
         <div className="px-4 py-2 text-sm text-muted-foreground">
-          <span className="typing-animation">typing...</span>
+          <span className="typing-animation">
+            {language === "english" ? "typing..." : "टाइप कर रहा है..."}
+          </span>
         </div>
       )}
 
@@ -137,7 +147,7 @@ export const ChatInterface = ({ personality, onBack }: ChatInterfaceProps) => {
           <Input
             value={input}
             onChange={(e) => setInput(e.target.value)}
-            placeholder="Type a message..."
+            placeholder={getPlaceholderText()}
             onKeyPress={(e) => e.key === "Enter" && handleSend()}
             disabled={isLoading}
           />

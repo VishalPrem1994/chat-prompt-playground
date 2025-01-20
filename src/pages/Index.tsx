@@ -4,6 +4,7 @@ import { ChatInterface } from "@/components/ChatInterface";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { useToast } from "@/components/ui/use-toast";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 
 const initialPersonalities = [
   {
@@ -55,6 +56,7 @@ const Index = () => {
   const [apiKey, setApiKey] = useState("");
   const [isKeySet, setIsKeySet] = useState(false);
   const [personalities, setPersonalities] = useState(initialPersonalities);
+  const [language, setLanguage] = useState<"english" | "hindi">("english");
   const { toast } = useToast();
 
   useEffect(() => {
@@ -118,12 +120,24 @@ const Index = () => {
       <ChatInterface
         personality={selectedPersonality}
         onBack={() => setSelectedPersonality(null)}
+        language={language}
       />
     );
   }
 
   return (
     <div className="min-h-screen p-4">
+      <div className="fixed top-4 right-4 z-50">
+        <Select value={language} onValueChange={(value: "english" | "hindi") => setLanguage(value)}>
+          <SelectTrigger className="w-32">
+            <SelectValue placeholder="Select language" />
+          </SelectTrigger>
+          <SelectContent>
+            <SelectItem value="english">English</SelectItem>
+            <SelectItem value="hindi">Hindi</SelectItem>
+          </SelectContent>
+        </Select>
+      </div>
       <div className="card-swipe-container">
         {personalities.map((personality, index) => (
           <PersonalityCard
