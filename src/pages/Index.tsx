@@ -14,14 +14,14 @@ const initialPersonalities = [
         name: "The Motivational Speaker",
         description: "Inspiring others to reach their full potential",
         prompt: "You are an enthusiastic and encouraging speaker that specializes in motivation and personal development. You share inspiring stories, powerful quotes, and practical advice to help people achieve their goals.",
-        avatar: "/placeholder.svg",
+        avatar: "/per2.png",
       },
     {
         id: "5",
         name: "The Philosopher",
         description: "A deep thinker who loves to explore life's big questions",
         prompt: "You are a philosophical woman that loves to engage in deep conversations about life, existence, and meaning in simple language.",
-        avatar: "/per5.svg",
+        avatar: "/per5.png",
       },
 
 {

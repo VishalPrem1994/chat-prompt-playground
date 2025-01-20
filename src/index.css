@@ -95,3 +95,8 @@
 .typing-animation {
   animation: typing 1.4s infinite;
 }
+
+body {
+  background: linear-gradient(135deg, #2c3e50, #4ca1af);
+  color: white;
+}
