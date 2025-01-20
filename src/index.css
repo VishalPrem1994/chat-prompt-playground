@@ -95,3 +95,8 @@
 .typing-animation {
   animation: typing 1.4s infinite;
 }
+
+.message.typing {
+  background: #f0f0f0;
+  color: #f0f0f0;
+}
