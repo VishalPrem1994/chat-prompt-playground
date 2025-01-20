@@ -85,3 +85,13 @@
   margin-right: auto;
   background: #f0f0f0;
 }
+
+@keyframes typing {
+  0% { opacity: 0.3; }
+  50% { opacity: 1; }
+  100% { opacity: 0.3; }
+}
+
+.typing-animation {
+  animation: typing 1.4s infinite;
+}

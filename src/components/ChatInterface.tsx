@@ -3,7 +3,6 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { ArrowLeft, Send } from "lucide-react";
 import { useToast } from "@/components/ui/use-toast";
-import { Progress } from "@/components/ui/progress";
 
 interface Message {
   id: string;
@@ -25,7 +24,6 @@ export const ChatInterface = ({ personality, onBack }: ChatInterfaceProps) => {
   const [messages, setMessages] = useState<Message[]>([]);
   const [input, setInput] = useState("");
   const [isLoading, setIsLoading] = useState(false);
-  const [progress, setProgress] = useState(0);
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const { toast } = useToast();
 
@@ -36,24 +34,6 @@ export const ChatInterface = ({ personality, onBack }: ChatInterfaceProps) => {
   useEffect(() => {
     scrollToBottom();
   }, [messages]);
-
-  useEffect(() => {
-    if (isLoading) {
-      const interval = setInterval(() => {
-        setProgress((prev) => {
-          if (prev >= 90) {
-            return prev;
-          }
-          return prev + 10;
-        });
-      }, 500);
-
-      return () => {
-        clearInterval(interval);
-        setProgress(0);
-      };
-    }
-  }, [isLoading]);
 
   const handleSend = async () => {
     if (!input.trim() || isLoading) return;
@@ -78,7 +58,6 @@ export const ChatInterface = ({ personality, onBack }: ChatInterfaceProps) => {
     setMessages((prev) => [...prev, userMessage]);
     setInput("");
     setIsLoading(true);
-    setProgress(0);
 
     try {
       const response = await fetch("https://api.openai.com/v1/chat/completions", {
@@ -123,8 +102,6 @@ export const ChatInterface = ({ personality, onBack }: ChatInterfaceProps) => {
       });
     } finally {
       setIsLoading(false);
-      setProgress(100);
-      setTimeout(() => setProgress(0), 500);
     }
   };
 
@@ -138,8 +115,8 @@ export const ChatInterface = ({ personality, onBack }: ChatInterfaceProps) => {
       </div>
 
       {isLoading && (
-        <div className="px-4 py-2">
-          <Progress value={progress} className="w-full h-2" />
+        <div className="px-4 py-2 text-sm text-muted-foreground">
+          <span className="typing-animation">typing...</span>
         </div>
       )}
 
