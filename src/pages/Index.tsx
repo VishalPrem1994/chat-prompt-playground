@@ -5,7 +5,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { useToast } from "@/components/ui/use-toast";
 
-const personalities = [
+const initialPersonalities = [
   {
     id: "1",
     name: "The Philosopher",
@@ -30,9 +30,10 @@ const personalities = [
 ];
 
 const Index = () => {
-  const [selectedPersonality, setSelectedPersonality] = useState<typeof personalities[0] | null>(null);
+  const [selectedPersonality, setSelectedPersonality] = useState<typeof initialPersonalities[0] | null>(null);
   const [apiKey, setApiKey] = useState("");
   const [isKeySet, setIsKeySet] = useState(false);
+  const [personalities, setPersonalities] = useState(initialPersonalities);
   const { toast } = useToast();
 
   useEffect(() => {
@@ -43,9 +44,11 @@ const Index = () => {
     }
   }, []);
 
-  const handleSwipe = (direction: "left" | "right", personality: typeof personalities[0]) => {
+  const handleSwipe = (direction: "left" | "right", personality: typeof initialPersonalities[0]) => {
     if (direction === "right") {
       setSelectedPersonality(personality);
+    } else if (direction === "left") {
+      setPersonalities((prev) => prev.filter((p) => p.id !== personality.id));
     }
   };
 
