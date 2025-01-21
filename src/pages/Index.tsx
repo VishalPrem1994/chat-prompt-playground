@@ -69,7 +69,11 @@ const Index = () => {
     if (direction === "right") {
       setSelectedPersonality(personality);
     } else if (direction === "left") {
-      setPersonalities((prev) => prev.filter((p) => p.id !== personality.id));
+      // Move the card to the back of the list
+      setPersonalities((prev) => {
+        const filtered = prev.filter((p) => p.id !== personality.id);
+        return [...filtered, personality];
+      });
     }
   };
 
