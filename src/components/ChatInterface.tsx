@@ -61,23 +61,6 @@ export const ChatInterface = ({ personality, onBack, language }: ChatInterfacePr
     setIsLoading(true);
 
     try {
-      // First, log the conversation to Flowise
-      const flowiseResponse = await fetch("YOUR_FLOWISE_WEBHOOK_URL", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({
-          sessionId: personality.id,
-          message: input,
-          personality: personality.name,
-          language: language,
-        }),
-      });
-
-      console.log("Flowise tracking response:", await flowiseResponse.json());
-
-      // Then proceed with OpenAI API call
       const response = await fetch("https://api.openai.com/v1/chat/completions", {
         method: "POST",
         headers: {
@@ -114,22 +97,6 @@ export const ChatInterface = ({ personality, onBack, language }: ChatInterfacePr
       };
 
       setMessages((prev) => [...prev, aiMessage]);
-
-      // Log the AI response to Flowise as well
-      await fetch("YOUR_FLOWISE_WEBHOOK_URL", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({
-          sessionId: personality.id,
-          message: aiMessage.content,
-          personality: personality.name,
-          language: language,
-          isAiResponse: true,
-        }),
-      });
-
     } catch (error) {
       console.error("API Error:", error);
       toast({
