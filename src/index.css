@@ -32,7 +32,7 @@
     @apply border-border;
   }
   body {
-    @apply bg-gradient-to-br from-[#1A1F2C] to-[#221F26] min-h-screen text-foreground;
+    @apply bg-gradient-to-br from-[#1A1F2C] via-[#403E43] via-[#7E69AB] to-[#221F26] min-h-screen text-foreground;
   }
 }
 
