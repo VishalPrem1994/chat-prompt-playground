@@ -7,6 +7,7 @@ export default async function handler(
   const saladCloudUrl = 'https://jujube-spinach-40dapeep3i9p2t75.salad.cloud/v1/chat/completions';
   
   try {
+    console.log("Running on Vercel Node");
     console.log('Request body:', request.body);
     console.log('API Key present:', !!process.env.SALAD_CLOUD_API_KEY);
 
