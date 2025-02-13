@@ -11,17 +11,24 @@ export default async function handler(
     console.log('Request body:', request.body);
     console.log('API Key present:', !!process.env.SALAD_CLOUD_API_KEY);
 
+    const { model, messages, temperature, max_tokens } = request.body;
+
     if (!process.env.SALAD_CLOUD_API_KEY) {
       throw new Error('SALAD_CLOUD_API_KEY is not configured');
     }
 
     const result = await fetch(saladCloudUrl, {
-      method: 'POST',  // Explicitly set to POST
+      method: 'POST',
       headers: {
         'Content-Type': 'application/json',
         'Authorization': `Bearer ${process.env.SALAD_CLOUD_API_KEY}`
       },
-      body: JSON.stringify(request.body)
+      body: JSON.stringify({
+        model,
+        messages,
+        temperature,
+        max_tokens
+      })
     });
 
     if (!result.ok) {
