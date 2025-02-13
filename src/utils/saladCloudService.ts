@@ -10,9 +10,7 @@ interface SaladCloudResponse {
   }>;
 }
 
-const API_URL = process.env.NODE_ENV === 'production' 
-  ? '/api/chat'  // This will call our Vercel API route
-  : 'https://jujube-spinach-40dapeep3i9p2t75.salad.cloud/v1/chat/completions';
+const API_URL = '/api/chat' //'https://jujube-spinach-40dapeep3i9p2t75.salad.cloud/v1/chat/completions';
 
 export class SaladCloudService {
   private readonly apiKey: string;
