@@ -26,17 +26,18 @@ export class SaladCloudManager {
     this.apiKey = apiKey;
   }
 
+  trimMessageHistory(messageHistory: ChatMessage[]): ChatMessage[] {
+    if (messageHistory.length > 40) {
+      return messageHistory.slice(0, 10).concat(messageHistory.slice(-30));
+    }
+    return messageHistory;
+  }
+
    async makeRequest(messages: ChatMessage[], temperature: number = 0.7, maxTokens: number = 150): Promise<ChatResponse> {
     console.log('\n[Salad Cloud API Request]');
 
     // Keep first 10 and last 20 messages
-    let trimmedMessages = messages;
-    if (messages.length > 30) {
-      trimmedMessages = [
-        ...messages.slice(0, 10),  // First 10 messages
-        ...messages.slice(-20)     // Last 20 messages
-      ];
-    }
+    let trimmedMessages = this.trimMessageHistory(messages);
 
     console.log('Messages:', trimmedMessages);
     console.log('Temperature:', temperature);
@@ -101,9 +102,13 @@ Respond with only "true" if the user is requesting a picture, or "false" if not.
     }
   }
 
-  async detectBoredom(messageHistory: string, boredCount: number, timeSinceLastResponse: number): Promise<boolean> {
+  
+
+  async detectBoredom(messageHistory: ChatMessage[], boredCount: number, timeSinceLastResponse: number): Promise<boolean> {
     // Trim message history if too long
-    let trimmedHistory = messageHistory;
+    let trimmedMessages = this.trimMessageHistory(messageHistory);
+    
+
     const prompt = `Analyze if the user seems bored or disengaged in this conversation.
     If the user says something like "I'm bored" or "I'm not interested" or "I'm not in the mood" or "I'm not feeling like talking", then respond with true.
 Otherwise Consider these factors:
@@ -141,15 +146,16 @@ Respond with only "true" if user seems bored, or "false" if they seem engaged.`;
     }
   }
 
-  async generateScenario(personality: string, conversationContext: string): Promise<string> {
+  async generateScenario(personality: string, conversationContext: ChatMessage[]): Promise<string> {
     try {
+      const trimmedConversationContext = this.trimMessageHistory(conversationContext);
       const response = await this.makeRequest(
         [
           { role: 'system', content: `You are ${personality}` },
           { role: 'user', content: `Generate a short, engaging roleplay scenario to spice up the conversation. 
             The scenario should match your personality and be flirty but not explicit. 
             Keep it under 100 words and make it feel natural. No childish content or language.
-            Previous conversation context: ${conversationContext}` }
+            Previous conversation context: ${trimmedConversationContext.map(msg => `${msg.role}: ${msg.content}`).join('\n')}` }
         ],
         0.8,
         200
@@ -173,13 +179,7 @@ Respond with only "true" if user seems bored, or "false" if they seem engaged.`;
       ];
 
       // Trim conversation history if too long
-      let trimmedHistory = conversationHistory;
-      if (conversationHistory.length > 30) {
-        trimmedHistory = [
-          ...conversationHistory.slice(0, 10),
-          ...conversationHistory.slice(-20)
-        ];
-      }
+      let trimmedHistory = this.trimMessageHistory(conversationHistory);
 
       // Add conversation history
       trimmedHistory.forEach(msg => {
