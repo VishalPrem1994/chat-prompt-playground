@@ -2,6 +2,12 @@
   "buildCommand": "npm run build",
   "outputDirectory": "dist",
   "framework": "vite",
+  "rewrites": [
+    {
+      "source": "/api/chat",
+      "destination": "/api/chat.ts"
+    }
+  ],
   "functions": {
     "api/chat.ts": {
       "memory": 1024,
@@ -9,10 +15,6 @@
     }
   },
   "routes": [
-    {
-      "source": "/api/chat",
-      "destination": "/api/chat.ts"
-    },
     {
       "source": "/(.*)",
       "destination": "/index.html"
