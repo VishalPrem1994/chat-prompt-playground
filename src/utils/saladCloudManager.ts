@@ -19,7 +19,7 @@ export class SaladCloudManager {
   private readonly model: string = 'hf.co/ArliAI/Mistral-Small-22B-ArliAI-RPMax-v1.1-GGUF:Q5_K_M';
 
   constructor() {
-    const apiKey = import.meta.env.VITE_SALAD_API_KEY;
+    const apiKey = process.env.SALAD_CLOUD_API_KEY;
     if (!apiKey) {
       throw new Error('SALAD_API_KEY is not set in environment variables');
     }
