@@ -28,7 +28,17 @@ export class SaladCloudManager {
 
    async makeRequest(messages: ChatMessage[], temperature: number = 0.7, maxTokens: number = 150): Promise<ChatResponse> {
     console.log('\n[Salad Cloud API Request]');
-    console.log('Messages:', messages);
+
+    // Keep first 10 and last 20 messages
+    let trimmedMessages = messages;
+    if (messages.length > 30) {
+      trimmedMessages = [
+        ...messages.slice(0, 10),  // First 10 messages
+        ...messages.slice(-20)     // Last 20 messages
+      ];
+    }
+
+    console.log('Messages:', trimmedMessages);
     console.log('Temperature:', temperature);
     console.log('Max Tokens:', maxTokens);
 
@@ -40,7 +50,7 @@ export class SaladCloudManager {
       },
       body: JSON.stringify({
         model: this.model,
-        messages,
+        messages: trimmedMessages,
         temperature,
         max_tokens: maxTokens
       })
@@ -92,6 +102,8 @@ Respond with only "true" if the user is requesting a picture, or "false" if not.
   }
 
   async detectBoredom(messageHistory: string, boredCount: number, timeSinceLastResponse: number): Promise<boolean> {
+    // Trim message history if too long
+    let trimmedHistory = messageHistory;
     const prompt = `Analyze if the user seems bored or disengaged in this conversation.
     If the user says something like "I'm bored" or "I'm not interested" or "I'm not in the mood" or "I'm not feeling like talking", then respond with true.
 Otherwise Consider these factors:
@@ -160,8 +172,17 @@ Respond with only "true" if user seems bored, or "false" if they seem engaged.`;
         { role: 'system', content: systemPrompt }
       ];
 
-      // Add conversation history, ensuring each message has proper role
-      conversationHistory.forEach(msg => {
+      // Trim conversation history if too long
+      let trimmedHistory = conversationHistory;
+      if (conversationHistory.length > 30) {
+        trimmedHistory = [
+          ...conversationHistory.slice(0, 10),
+          ...conversationHistory.slice(-20)
+        ];
+      }
+
+      // Add conversation history
+      trimmedHistory.forEach(msg => {
         messages.push({
           role: msg.role,
           content: msg.content.trim()
@@ -170,8 +191,8 @@ Respond with only "true" if user seems bored, or "false" if they seem engaged.`;
 
       const response = await this.makeRequest(
         messages,
-        0.7,  // temperature for creative responses
-        150   // max tokens for response length
+        0.7,
+        150
       );
 
       const aiResponse = response.choices[0].message.content.trim();
