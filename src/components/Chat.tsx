@@ -25,6 +25,7 @@ const Chat: React.FC<ChatProps> = ({
   const [boredCount, setBoredCount] = useState(0);
   const [lastResponseTime, setLastResponseTime] = useState(Date.now());
   const messageAnalyzer = new MessageAnalyzer();
+  const [isFirstMessage, setIsFirstMessage] = useState(true);
 
   const scrollToBottom = () => {
     messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
@@ -73,7 +74,7 @@ const Chat: React.FC<ChatProps> = ({
 
       // Check for boredom
       const isBored = await saladCloudManager.detectBoredom(
-        messages.map(m => `${m.role}: ${m.content}`).join('\n'),
+        messages,
         boredCount,
         lastResponseTime
       );
@@ -83,7 +84,7 @@ const Chat: React.FC<ChatProps> = ({
         setBoredCount(prev => prev + 1);
         aiResponse = await saladCloudManager.generateScenario(
           personality.systemPrompt,
-          messages.map(m => `${m.role}: ${m.content}`).join('\n')
+          messages
         );
       } else {
         aiResponse = await saladCloudManager.generateResponse(
@@ -158,7 +159,7 @@ const Chat: React.FC<ChatProps> = ({
         {isLoading && (
           <div className="flex justify-start mb-4">
             <div className="bg-primary text-light rounded-lg p-3">
-              <p>Typing...</p>
+              <p>{messages.length === 1 ? "Typing...First reply may take up to a minute..." : "Typing..."}</p>
             </div>
           </div>
         )}
