@@ -15,7 +15,7 @@ interface ChatResponse {
 
 export class SaladCloudManager {
     private readonly apiKey: string;
-  private readonly baseUrl: string = '/api/chat' //'https://jujube-spinach-40dapeep3i9p2t75.salad.cloud/v1/chat/completions';
+  private readonly baseUrl: string = 'https://jujube-spinach-40dapeep3i9p2t75.salad.cloud/v1/chat/completions';
   private readonly model: string = 'hf.co/ArliAI/Mistral-Small-22B-ArliAI-RPMax-v1.1-GGUF:Q5_K_M';
 
   constructor() {

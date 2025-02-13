@@ -72,8 +72,8 @@ const Chat: React.FC<ChatProps> = ({
       }
 
       // Check for boredom
-      const isBored = await messageAnalyzer.detectBoredom(
-        messages, 
+      const isBored = await saladCloudManager.detectBoredom(
+        messages.map(m => `${m.role}: ${m.content}`).join('\n'),
         boredCount,
         lastResponseTime
       );
@@ -81,7 +81,10 @@ const Chat: React.FC<ChatProps> = ({
       let aiResponse: string;
       if (isBored) {
         setBoredCount(prev => prev + 1);
-        aiResponse = messageAnalyzer.getEngagementResponse();
+        aiResponse = await saladCloudManager.generateScenario(
+          personality.systemPrompt,
+          messages.map(m => `${m.role}: ${m.content}`).join('\n')
+        );
       } else {
         aiResponse = await saladCloudManager.generateResponse(
           personality.systemPrompt,
