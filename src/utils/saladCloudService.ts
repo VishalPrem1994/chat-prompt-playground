@@ -10,9 +10,13 @@ interface SaladCloudResponse {
   }>;
 }
 
+const API_URL = process.env.NODE_ENV === 'production' 
+  ? '/api/chat'  // This will call our Vercel API route
+  : 'https://jujube-spinach-40dapeep3i9p2t75.salad.cloud/v1/chat/completions';
+
 export class SaladCloudService {
   private readonly apiKey: string;
-  private readonly baseURL: string = 'https://jujube-spinach-40dapeep3i9p2t75.salad.cloud/v1/chat/completions';
+  private readonly baseURL: string = API_URL;
   private readonly model: string = 'hf.co/ArliAI/Mistral-Small-22B-ArliAI-RPMax-v1.1-GGUF:Q5_K_M';
   private readonly messageAnalyzer: MessageAnalyzer;
 
