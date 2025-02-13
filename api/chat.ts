@@ -1,9 +1,9 @@
 import type { VercelRequest, VercelResponse } from '@vercel/node';
 
-export default async function handler(
+const handler = async (
   request: VercelRequest,
   response: VercelResponse
-) {
+) => {
   const saladCloudUrl = 'https://jujube-spinach-40dapeep3i9p2t75.salad.cloud/v1/chat/completions';
   
   try {
@@ -46,4 +46,6 @@ export default async function handler(
       details: error instanceof Error ? error.message : 'Unknown error'
     });
   }
-} 
+};
+
+export default handler; 
