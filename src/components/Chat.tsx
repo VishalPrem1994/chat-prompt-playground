@@ -159,7 +159,7 @@ const Chat: React.FC<ChatProps> = ({
         {isLoading && (
           <div className="flex justify-start mb-4">
             <div className="bg-primary text-light rounded-lg p-3">
-              <p>{messages.length === 1 ? "Typing...First reply may take up to a minute..." : "Typing..."}</p>
+              <p>{"Typing..."}</p>
             </div>
           </div>
         )}
