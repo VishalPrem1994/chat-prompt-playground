@@ -36,7 +36,7 @@ const Chat: React.FC<ChatProps> = ({
   }, [messages]);
 
   useEffect(() => {
-    console.log('API Key available:', !!process.env.SALAD_CLOUD_API_KEY);
+    console.log('API Key available:', !!import.meta.env.VITE_SALAD_API_KEY);
   }, []);
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -159,7 +159,7 @@ const Chat: React.FC<ChatProps> = ({
         {isLoading && (
           <div className="flex justify-start mb-4">
             <div className="bg-primary text-light rounded-lg p-3">
-              <p className="animate-glow">{"Typing..."}</p>
+              <p>{messages.length === 1 ? "Typing...First reply may take up to a minute..." : "Typing..."}</p>
             </div>
           </div>
         )}
