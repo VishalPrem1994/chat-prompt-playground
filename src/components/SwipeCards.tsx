@@ -1,4 +1,5 @@
-import React, { useState, useEffect, TouchEvent } from 'react';
+import React, { useState, useEffect } from 'react';
+import TinderCard from 'react-tinder-card';
 import { AIPersonality } from '../types';
 import { aiPersonalities } from '../config/personalities';
 
@@ -20,8 +21,6 @@ const SwipeCards: React.FC<Props> = ({ onPersonalitySelect, userId }) => {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [rejectedPersonalities, setRejectedPersonalities] = useState<RejectedPersonality[]>([]);
-  const [touchStart, setTouchStart] = useState<number | null>(null);
-  const [touchEnd, setTouchEnd] = useState<number | null>(null);
 
   const fetchPersonalities = () => {
     // Get matched personalities from localStorage
@@ -84,31 +83,6 @@ const SwipeCards: React.FC<Props> = ({ onPersonalitySelect, userId }) => {
     return `${secondsLeft}s`;
   };
 
-  const handleTouchStart = (e: TouchEvent) => {
-    setTouchStart(e.targetTouches[0].clientX);
-  };
-
-  const handleTouchMove = (e: TouchEvent) => {
-    setTouchEnd(e.targetTouches[0].clientX);
-  };
-
-  const handleTouchEnd = (personality: AIPersonality) => {
-    if (!touchStart || !touchEnd) return;
-
-    const distance = touchStart - touchEnd;
-    const isLeftSwipe = distance > 50;
-    const isRightSwipe = distance < -50;
-
-    if (isLeftSwipe) {
-      handleSwipe('left', personality);
-    } else if (isRightSwipe) {
-      handleSwipe('right', personality);
-    }
-
-    setTouchStart(null);
-    setTouchEnd(null);
-  };
-
   if (loading) {
     return (
       <div className="flex items-center justify-center h-[60vh]">
@@ -144,17 +118,14 @@ const SwipeCards: React.FC<Props> = ({ onPersonalitySelect, userId }) => {
   return (
     <div className="flex flex-col items-center">
       <div className="w-full max-w-sm h-[60vh] relative">
-        {personalities.map((personality, index) => {
-          if (index !== personalities.length - 1) return null;
-
-          return (
-            <div
-              key={personality.id}
-              className="absolute w-full h-full"
-              onTouchStart={handleTouchStart}
-              onTouchMove={handleTouchMove}
-              onTouchEnd={() => handleTouchEnd(personality)}
-            >
+        {personalities.map((personality) => (
+          <TinderCard
+            key={personality.id}
+            onSwipe={(dir) => handleSwipe(dir, personality)}
+            preventSwipe={['up', 'down']}
+            className="absolute w-full h-full"
+          >
+            <div className="absolute w-full h-full">
               <div className="w-full h-full bg-primary rounded-2xl shadow-xl p-6 flex flex-col items-center justify-center cursor-grab border border-secondary">
                 <div className="relative w-[75%] aspect-square mb-4 rounded-full overflow-hidden">
                   <img
@@ -171,8 +142,8 @@ const SwipeCards: React.FC<Props> = ({ onPersonalitySelect, userId }) => {
                 </p>
               </div>
             </div>
-          );
-        })}
+          </TinderCard>
+        ))}
       </div>
       <div className="mt-8 text-light text-center">
         <p>Swipe right to chat, left to skip!</p>
