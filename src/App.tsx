@@ -2,17 +2,20 @@ import React, { useState, useEffect } from 'react';
 import SwipeCards from './components/SwipeCards';
 import Chat from './components/Chat';
 import MatchedPersonalities from './components/MatchedPersonalities';
+import Login from './components/Login';
+import Signup from './components/Signup';
 import { v4 as uuidv4 } from 'uuid';
 import { AIPersonality, Message } from './types';
 
 type View = 'swipe' | 'chat' | 'matches';
 
-function App() {
+const App: React.FC = () => {
   const [selectedPersonality, setSelectedPersonality] = useState<AIPersonality | null>(null);
   const [messages, setMessages] = useState<Message[]>([]);
-  const [userId, setUserId] = useState<string>('');
+  const [userId, setUserId] = useState<string | null>(null);
   const [currentView, setCurrentView] = useState<View>('swipe');
   const [matchedPersonalities, setMatchedPersonalities] = useState<AIPersonality[]>([]);
+  const [showSignup, setShowSignup] = useState(false);
 
   useEffect(() => {
     // Get or generate user ID
@@ -68,6 +71,23 @@ function App() {
     const updatedRejections = [...existingRejections, newRejection];
     localStorage.setItem(`rejectedPersonalities_${userId}`, JSON.stringify(updatedRejections));
   };
+
+  if (!userId) {
+    if (showSignup) {
+      return (
+        <Signup
+          onSignup={(id) => setUserId(id)}
+          onBackToLogin={() => setShowSignup(false)}
+        />
+      );
+    }
+    return (
+      <Login
+        onLogin={(id) => setUserId(id)}
+        onSignupClick={() => setShowSignup(true)}
+      />
+    );
+  }
 
   const renderView = () => {
     switch (currentView) {
@@ -136,6 +156,6 @@ function App() {
       {renderView()}
     </div>
   );
-}
+};
 
 export default App; 
