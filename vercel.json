@@ -10,8 +10,12 @@
   },
   "rewrites": [
     {
-      "source": "/api/chat",
-      "destination": "/api/chat.js"
+      "source": "/api/chat_grok",
+      "destination": "/api/call_grok.js"
+    },
+    {
+      "source": "/api/chat_saladcloud",
+      "destination": "/api/chat_saladcloud.js"
     },
     {
       "source": "/(.*)",
