@@ -2,6 +2,7 @@ export interface AIPersonality {
   id: string;
   name: string;
   description: string;
+  systemPrompt: string;
   avatar: string;
 }
 
