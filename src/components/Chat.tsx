@@ -1,8 +1,9 @@
-import React, { useState, useRef, useEffect } from 'react';
-import { saladCloudManager } from '../utils/saladCloudManager';
+import React, { useState, useRef, useEffect, useMemo } from 'react';
 import { analyzeConversation } from '../utils/promptManager';
-import { Message, AIPersonality } from '../types';  // Import shared types
+import { Message, AIPersonality, MessageContent } from '../types';  // Import shared types
 import { MessageAnalyzer } from '../utils/messageAnalyzer';
+import { LanguageManager } from '../utils/languageManager';
+import { GrokManager } from '../utils/grokManager';
 
 interface ChatProps {
   personality: AIPersonality;
@@ -24,8 +25,8 @@ const Chat: React.FC<ChatProps> = ({
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const [boredCount, setBoredCount] = useState(0);
   const [lastResponseTime, setLastResponseTime] = useState(Date.now());
-  const messageAnalyzer = new MessageAnalyzer();
-  const [isFirstMessage, setIsFirstMessage] = useState(true);
+  
+  const languageManager = useMemo(() => new LanguageManager(new GrokManager()), []);
 
   const scrollToBottom = () => {
     messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
@@ -35,17 +36,18 @@ const Chat: React.FC<ChatProps> = ({
     scrollToBottom();
   }, [messages]);
 
-  useEffect(() => {
-    console.log('API Key available:', !!import.meta.env.VITE_SALAD_API_KEY);
-  }, []);
+
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!inputMessage.trim()) return;
 
-    const userMessage: Message = {
+    // Process user message for multiple languages
+    
+    
+    let userMessage: Message = {
       role: 'user',
-      content: inputMessage.trim(),
+      content: inputMessage,
       timestamp: new Date()
     };
 
@@ -56,16 +58,24 @@ const Chat: React.FC<ChatProps> = ({
 
     try {
       // Check for picture request
-      const isPictureRequest = await saladCloudManager.detectPictureRequest(userMessage.content);
+      const processedContent = await languageManager.processUserMessage(inputMessage.trim());
+      userMessage = {
+        role: 'user',
+        content: processedContent,
+        timestamp: new Date()
+      };
+      
+      const isPictureRequest = await languageManager.detectPictureRequest(userMessage);
       if (isPictureRequest) {
-        const pictureResponse = await saladCloudManager.generateImageDescription(
+        const pictureResponse = await languageManager.generateImageDescription(
           personality.name,
-          userMessage.content,
-          messages
+          userMessage,
+          [...messages, userMessage]
         );
+        const processedResponse = await languageManager.processAssistantResponse(pictureResponse);
         setMessages(prev => [...prev, {
           role: 'assistant',
-          content: pictureResponse,
+          content: processedResponse,
           timestamp: new Date()
         }]);
         setIsLoading(false);
@@ -73,8 +83,8 @@ const Chat: React.FC<ChatProps> = ({
       }
 
       // Check for boredom
-      const isBored = await saladCloudManager.detectBoredom(
-        messages,
+      const isBored = await languageManager.detectBoredom(
+        [...messages, userMessage],
         boredCount,
         lastResponseTime
       );
@@ -82,36 +92,49 @@ const Chat: React.FC<ChatProps> = ({
       let aiResponse: string;
       if (isBored) {
         setBoredCount(prev => prev + 1);
-        aiResponse = await saladCloudManager.generateScenario(
+        aiResponse = await languageManager.generateScenario(
           personality.systemPrompt,
-          messages
+          [...messages, userMessage]
         );
       } else {
-        aiResponse = await saladCloudManager.generateResponse(
+        aiResponse = await languageManager.generateResponse(
           personality.systemPrompt,
           [...messages, userMessage]
         );
       }
 
+      const processedResponse = await languageManager.processAssistantResponse(aiResponse);
       const assistantMessage: Message = {
         role: 'assistant',
-        content: aiResponse,
+        content: processedResponse,
         timestamp: new Date()
       };
+
+      console.log('Current Full Conversation:', [...messages, userMessage, assistantMessage]);
 
       setMessages(prev => [...prev, assistantMessage]);
       setLastResponseTime(Date.now());
     } catch (error) {
       console.error('Error getting AI response:', error);
-      // Add user-facing error message
+      const errorResponse = await languageManager.processAssistantResponse('Sorry, I had trouble responding. Please try again.');
       setMessages(prev => [...prev, {
         role: 'assistant',
-        content: 'Sorry, I had trouble responding. Please try again.',
+        content: errorResponse,
         timestamp: new Date()
       }]);
     } finally {
       setIsLoading(false);
     }
+  };
+
+  const renderMessageContent = (content: string | MessageContent[]): string => {
+    if (typeof content === 'string') {
+      return content;
+    }
+    // For multilingual content, prefer Hindi if available, fallback to English
+    const hindiContent = content.find(c => c.language === 'hindi');
+    const englishContent = content.find(c => c.language === 'english');
+    return hindiContent?.content || englishContent?.content || content[0].content;
   };
 
   return (
@@ -149,7 +172,16 @@ const Chat: React.FC<ChatProps> = ({
                   : 'bg-primary text-light'
               }`}
             >
-              <p className="whitespace-pre-wrap">{message.content}</p>
+              <p className="whitespace-pre-wrap">{renderMessageContent(message.content)}</p>
+              {Array.isArray(message.content) && message.content.length > 1 && (
+                <div className="text-xs opacity-75 mt-1">
+                  {message.content.map((c, i) => (
+                    <span key={i} className="mr-2">
+                      {c.language === 'hindi' ? 'हिंदी' : 'English'}
+                    </span>
+                  ))}
+                </div>
+              )}
               <span className="text-xs opacity-75 mt-1 block">
                 {message.timestamp?.toLocaleTimeString() || new Date().toLocaleTimeString()}
               </span>

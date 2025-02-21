@@ -14,8 +14,11 @@ interface ChatResponse {
 }
 
 export class GrokManager {
-  private readonly baseUrl: string = '/api/call_grok';
+  
+  private readonly baseUrl: string = '/api/grok';
   private readonly model: string = 'grok-1';
+
+  
 
   trimMessageHistory(messageHistory: ChatMessage[]): ChatMessage[] {
     if (messageHistory.length > 40) {
@@ -37,6 +40,7 @@ export class GrokManager {
     const response = await fetch(this.baseUrl, {
       method: 'POST',
       headers: {
+        
         'Content-Type': 'application/json',
       },
       body: JSON.stringify({
@@ -84,6 +88,43 @@ export class GrokManager {
       return translation;
     } catch (error) {
       console.error('[Hindi Translation Error]:', error);
+      throw error;
+    }
+  }
+
+  async translateToEnglish(text: string): Promise<string> {
+    try {
+      const response = await fetch(this.baseUrl, {
+        method: 'POST',
+        headers: {
+          
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          model: this.model,
+          messages: [
+            {
+              role: 'system',
+              content: 'You are a translator. Translate the given text to English. Only respond with the translation, nothing else.'
+            },
+            {
+              role: 'user',
+              content: text
+            }
+          ],
+          temperature: 0.3,
+          max_tokens: 150
+        })
+      });
+
+      if (!response.ok) {
+        throw new Error(`Translation request failed with status ${response.status}`);
+      }
+
+      const data = await response.json() as ChatResponse;
+      return data.choices[0].message.content.trim();
+    } catch (error) {
+      console.error('[Grok Translation Error]:', error);
       throw error;
     }
   }
