@@ -20,7 +20,7 @@
 
 //   constructor(apiKey: string) {
 //     this.apiKey = apiKey;
-//     this.messageAnalyzer = new MessageAnalyzer();
+//     this.messageAnalyzer = new MessageAnalyze  r();
 //   }
 
 //   async generateResponse(systemPrompt: string, messages: Message[]): Promise<string> {
@@ -119,4 +119,4 @@
 
 //     return scenarios[Math.floor(Math.random() * scenarios.length)];
 //   }
-// } 
+// }  

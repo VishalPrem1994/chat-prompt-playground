@@ -12,6 +12,7 @@ interface ConversationDecision {
   suggestedResponse?: string;
 }
 
+
 export async function analyzeConversation(
   message: string,
   context: ConversationContext

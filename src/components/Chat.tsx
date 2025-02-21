@@ -1,7 +1,6 @@
 import React, { useState, useRef, useEffect, useMemo } from 'react';
 import { analyzeConversation } from '../utils/promptManager';
 import { Message, AIPersonality, MessageContent } from '../types';  // Import shared types
-import { MessageAnalyzer } from '../utils/messageAnalyzer';
 import { LanguageManager } from '../utils/languageManager';
 import { GrokManager } from '../utils/grokManager';
 
@@ -64,7 +63,7 @@ const Chat: React.FC<ChatProps> = ({
         content: processedContent,
         timestamp: new Date()
       };
-      
+
       const isPictureRequest = await languageManager.detectPictureRequest(userMessage);
       if (isPictureRequest) {
         const pictureResponse = await languageManager.generateImageDescription(
