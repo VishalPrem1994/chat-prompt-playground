@@ -3,23 +3,23 @@
   "outputDirectory": "dist",
   "framework": "vite",
   "functions": {
-    "api/chat_grok.js": {
+    "api/call_grok.js": {
       "memory": 1024,
       "maxDuration": 60
     },
-    "api/chat_saladcloud.js": {
+    "api/call_saladcloud.js": {
       "memory": 1024,
       "maxDuration": 60
     }
   },
   "rewrites": [
     {
-      "source": "/api/chat_grok",
+      "source": "/api/call_grok",
       "destination": "/api/call_grok.js"
     },
     {
-      "source": "/api/chat_saladcloud",
-      "destination": "/api/chat_saladcloud.js"
+      "source": "/api/call_saladcloud",
+      "destination": "/api/call_saladcloud.js"
     },
     {
       "source": "/(.*)",

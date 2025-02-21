@@ -14,8 +14,8 @@ interface ChatResponse {
 }
 
 export class GrokManager {
-  
-  private readonly baseUrl: string = '/api/grok';
+    private readonly isProduction: boolean = true;
+  private readonly baseUrl: string = this.isProduction ? '/api/call_grok' : 'https://api.grok.com/v1/chat/completions';
   private readonly model: string = 'grok-1';
 
   
