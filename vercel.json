@@ -3,7 +3,11 @@
   "outputDirectory": "dist",
   "framework": "vite",
   "functions": {
-    "api/chat.js": {
+    "api/chat_grok.js": {
+      "memory": 1024,
+      "maxDuration": 60
+    },
+    "api/chat_saladcloud.js": {
       "memory": 1024,
       "maxDuration": 60
     }
