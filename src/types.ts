@@ -6,10 +6,15 @@ export interface AIPersonality {
   avatar: string;
 }
 
+export interface MessageContent {
+  language: string;
+  content: string;
+}
+
 export interface Message {
   id?: string;
   role: 'user' | 'assistant';
-  content: string;
+  content: string | MessageContent[];
   timestamp?: Date;
   created_at?: string;
 }
@@ -27,4 +32,9 @@ export interface RejectedPersonality {
   user_id?: string;
   personality_id: string;
   rejected_at: string;
-} 
+}
+
+export interface ChatMessage {
+  role: string;
+  content: string | MessageContent[];
+}
