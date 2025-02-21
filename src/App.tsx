@@ -1,17 +1,17 @@
 import React, { useState, useEffect } from 'react';
-import SwipeCards from './components/SwipeCards';
+import PersonalityGrid from './components/SwipeCards';
 import Chat from './components/Chat';
 import MatchedPersonalities from './components/MatchedPersonalities';
 import { v4 as uuidv4 } from 'uuid';
 import { AIPersonality, Message } from './types';
 
-type View = 'swipe' | 'chat' | 'matches';
+type View = 'personalities' | 'chat' | 'matches';
 
 function App() {
   const [selectedPersonality, setSelectedPersonality] = useState<AIPersonality | null>(null);
   const [messages, setMessages] = useState<Message[]>([]);
   const [userId, setUserId] = useState<string>('');
-  const [currentView, setCurrentView] = useState<View>('swipe');
+  const [currentView, setCurrentView] = useState<View>('personalities');
   const [matchedPersonalities, setMatchedPersonalities] = useState<AIPersonality[]>([]);
 
   useEffect(() => {
@@ -35,20 +35,21 @@ function App() {
   const handlePersonalitySelect = (personality: AIPersonality) => {
     console.log('Selected personality:', personality);
     setSelectedPersonality(personality);
+    
+    // Add to matched personalities if not already matched
+    if (!matchedPersonalities.find(p => p.id === personality.id)) {
+      const updatedMatches = [...matchedPersonalities, personality];
+      setMatchedPersonalities(updatedMatches);
+      localStorage.setItem('matchedPersonalities', JSON.stringify(updatedMatches));
+    }
+    
     setCurrentView('chat');
     setMessages([]); // Clear messages when starting new chat
   };
 
-  const handleSwipeRight = (personality: AIPersonality) => {
-    const updatedMatches = [...matchedPersonalities, personality];
-    setMatchedPersonalities(updatedMatches);
-    localStorage.setItem('matchedPersonalities', JSON.stringify(updatedMatches));
-    handlePersonalitySelect(personality);
-  };
-
   const handleBack = () => {
     setSelectedPersonality(null);
-    setCurrentView('swipe');
+    setCurrentView('personalities');
     setMessages([]); // Clear messages when going back
   };
 
@@ -94,8 +95,8 @@ function App() {
       default:
         return (
           <div className="container mx-auto px-4 py-8">
-            <SwipeCards 
-              onPersonalitySelect={handleSwipeRight}
+            <PersonalityGrid 
+              onPersonalitySelect={handlePersonalitySelect}
               userId={userId}
             />
           </div>
@@ -110,9 +111,9 @@ function App() {
           <div className="flex justify-between items-center mb-8">
             <div className="flex gap-4">
               <button
-                onClick={() => setCurrentView('swipe')}
+                onClick={() => setCurrentView('personalities')}
                 className={`px-4 py-2 rounded-lg transition-colors ${
-                  currentView === 'swipe'
+                  currentView === 'personalities'
                     ? 'bg-accent text-white'
                     : 'bg-primary text-light hover:bg-opacity-80'
                 }`}
