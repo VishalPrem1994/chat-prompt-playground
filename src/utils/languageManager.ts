@@ -1,4 +1,5 @@
 import { Message, MessageContent } from '../types';
+import { grokManager } from './grokManager';
 import { saladCloudManager } from './saladCloudManager';
 
 interface GrokManager {
@@ -6,16 +7,13 @@ interface GrokManager {
 }
 
 export class LanguageManager {
-  private readonly grokManager: GrokManager;
+  
   private userPreferredLanguage: 'english' | 'hindi' = 'english';
 
-  constructor(grokManager: GrokManager) {
-    this.grokManager = grokManager;
-  }
 
    private async isHindi(text: string): Promise<boolean> {
     // Basic Hindi detection - checks for Devanagari Unicode range
-    return await saladCloudManager.checkIfHindiNeeded(text);
+    return await grokManager.checkIfHindiNeeded(text);
   }
 
   private createMultilingualMessage(content: string, detectedLanguage: string): MessageContent[] {
@@ -43,7 +41,7 @@ export class LanguageManager {
       // If Hindi is detected, translate to English and store both versions
       this.userPreferredLanguage = 'hindi';
       console.log('[Language Manager] Hindi Detected:', message);
-      const englishTranslation = await saladCloudManager.translateToEnglish(message);
+      const englishTranslation = await grokManager.translateToEnglish(message);
       return [
         {
           language: 'hindi',
@@ -95,27 +93,27 @@ export class LanguageManager {
 
   async detectPictureRequest(messages: Message): Promise<boolean> {
     const saladCloudMessages = this.convertToSaladCloudFormat([messages]);
-    return saladCloudManager.detectPictureRequest(saladCloudMessages.map(msg => msg.content).join('\n'));
+    return grokManager.detectPictureRequest(saladCloudMessages.map(msg => msg.content).join('\n'));
   }
 
   async detectBoredom(messages: Message[], boredCount: number, timeSinceLastResponse: number): Promise<boolean> {
     const saladCloudMessages = this.convertToSaladCloudFormat(messages);
-    return saladCloudManager.detectBoredom(saladCloudMessages, boredCount, timeSinceLastResponse);
+    return grokManager.detectBoredom(saladCloudMessages, boredCount, timeSinceLastResponse);
   }
 
   async generateScenario(personality: string, messages: Message[]): Promise<string> {
     const saladCloudMessages = this.convertToSaladCloudFormat(messages);
-    return saladCloudManager.generateScenario(personality, saladCloudMessages);
+    return grokManager.generateScenario(personality, saladCloudMessages);
   }
 
   async generateResponse(systemPrompt: string, messages: Message[]): Promise<string> {
     const saladCloudMessages = this.convertToSaladCloudFormat(messages);
-    return saladCloudManager.generateResponse(systemPrompt, saladCloudMessages);
+    return grokManager.generateResponse(systemPrompt, saladCloudMessages);
   }
 
   async generateImageDescription(personality: string, message: Message, messages: Message[]): Promise<string> {
     const saladCloudMessages = this.convertToSaladCloudFormat(messages);
     const englishMessage = this.getEnglishContent(message.content);
-    return saladCloudManager.generateImageDescription(personality, englishMessage, saladCloudMessages);
+    return grokManager.generateImageDescription(personality, englishMessage, saladCloudMessages);
   }
 } 
