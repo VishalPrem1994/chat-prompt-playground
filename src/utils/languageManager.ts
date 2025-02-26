@@ -72,7 +72,7 @@ export class LanguageManager {
     // If user's preferred language is Hindi, translate the response
     if (this.userPreferredLanguage === 'hindi') {
       
-      const hindiTranslation = await saladCloudManager.translateToHindi(response);
+      const hindiTranslation = await grokManager.translateToHindi(response);
       console.log('[Language Manager] Hindi Added:', hindiTranslation);
       return [
         {
