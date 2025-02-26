@@ -13,7 +13,7 @@ export class LanguageManager {
 
    private async isHindi(text: string): Promise<boolean> {
     // Basic Hindi detection - checks for Devanagari Unicode range
-    return await saladCloudManager.checkIfHindiNeeded(text);
+    return await grokManager.checkIfHindiNeeded(text);
   }
 
   private createMultilingualMessage(content: string, detectedLanguage: string): MessageContent[] {

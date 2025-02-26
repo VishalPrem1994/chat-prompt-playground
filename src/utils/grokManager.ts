@@ -12,7 +12,7 @@ interface ChatResponse {
 export class GrokManager {
   private readonly isProduction: boolean = true;
   private readonly baseUrl: string = this.isProduction ? '/api/call_grok' : 'https://api.grok.com/v1/chat/completions';
-  private readonly model: string = 'grok-1';
+  private readonly model: string = 'grok-2-latest';
 
   private getMessageContent(content: string | MessageContent[]): string {
     if (typeof content === 'string') {
