@@ -41,7 +41,7 @@ export class LanguageManager {
       // If Hindi is detected, translate to English and store both versions
       this.userPreferredLanguage = 'hindi';
       console.log('[Language Manager] Hindi Detected:', message);
-      const englishTranslation = await grokManager.translateToEnglish(message);
+      const englishTranslation = await saladCloudManager.translateToEnglish(message);
       return [
         {
           language: 'hindi',
